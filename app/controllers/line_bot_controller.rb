@@ -5,6 +5,12 @@ class LineBotController < ApplicationController
     body = request.body.read
     # LINEのメッセージボディ確認済み
     # p body
+    signature = request.env['HTTP_X_LINE_SIGNATURE']
+    unless client.validate_signature(body, signature)
+      # p '不正なリクエストです'
+      return head :bad_request
+    end
+    # p '正しいリクエストです'
   end
 
   private
