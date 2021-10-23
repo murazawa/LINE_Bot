@@ -51,3 +51,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # LINE Messaging API SDK for Ruby インストール
 gem 'line-bot-api'
 gem 'dotenv-rails'
+gem 'httpclient'
