@@ -9,22 +9,18 @@ class LineBotController < ApplicationController
     unless client.validate_signature(body, signature)
       return head :bad_request
     end
-
     events = client.parse_events_from(body)
-      events.each do |event|
-        case event
-        when Line::Bot::Event::Message
-          case event.type
-          when Line::Bot::Event::MessageType::Text
-            message = {
-              type: 'text',
-              text: event.message['text']
-          }
-            client.reply_message(event['replyToken'], message)
-          end
+    events.each do |event|
+      case event
+      when Line::Bot::Event::Message
+        case event.type
+        when Line::Bot::Event::MessageType::Text
+          message = search_and_create_message(event.message['text'])
+          client.reply_message(event['replyToken'], message)
         end
       end
-      head :ok
+    end
+    head :ok
   end
 
   private
@@ -44,10 +40,23 @@ class LineBotController < ApplicationController
         'applicationId' => ENV['RAKUTEN_APPID'],
         'hits' => 5,
         'responseType' => 'small',
-        'formatVarsion' => 2
+        'formatVersion' => 2
       }
       response = http_client.get(url, query)
       response = JSON.parse(response.body)
+
+      text = ''
+      response['hotels'].each do |hotel|
+        text <<
+          hotel[0]['hotelBasicInfo']['hotelName'] + "\n" +
+          hotel[0]['hotelBasicInfo']['hotelInformationUrl'] + "\n" +
+          "\n"
+      end
+
+      message = {
+        type: 'text',
+        text: text
+      }
     end
 
 end
