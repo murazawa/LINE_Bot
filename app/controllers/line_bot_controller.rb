@@ -45,6 +45,9 @@ class LineBotController < ApplicationController
       response = http_client.get(url, query)
       response = JSON.parse(response.body)
 
+    if response.key?('error')
+      text = "鮫島くんが探している条件が見つかりませんでした。\n条件を変えて再検索してください。"
+    else
       text = ''
       response['hotels'].each do |hotel|
         text <<
@@ -52,6 +55,7 @@ class LineBotController < ApplicationController
           hotel[0]['hotelBasicInfo']['hotelInformationUrl'] + "\n" +
           "\n"
       end
+    end
 
       message = {
         type: 'text',
